@@ -4,6 +4,10 @@ const flightCodes = {
     SIA: 'Singapore Airlines',
     QF: 'Qantas',
     VOZ: "Virgin Australia",
+    MXD: 'Batik Air Malaysia',
+    UAE: 'Emirates',
+    CPA: 'Cathay Pacific',
+    CAL: 'China Airlines'
 }
 
 export function articleise(word) {
