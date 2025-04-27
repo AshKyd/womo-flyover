@@ -20,7 +20,7 @@ export function getAirline(flight) {
         return 'Unknown operator';
     }
 
-    return titlecase(operator.replace(/\sPTY\sLIMITED\.?/, '').replace(/\sPTY\sLTD\.?/, '').replace(' LIMITED').toLowerCase());
+    return titlecase(operator.replace(/\sPTY\sLIMITED\.?/, '').replace(/\sPTY\sLTD\.?/, '').replace(' LIMITED', '').toLowerCase());
 }
 
 export function isInBoundingBox(point, boundingBox) {
