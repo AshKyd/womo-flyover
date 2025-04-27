@@ -1,4 +1,4 @@
-# ✈️ FlightRadar WOMO
+# ✈️ WOMO Flyover
 
 A Node.js application that tracks aircraft flying over South Brisbane (West of Montague/WOMO) and posts updates to Mastodon. The application monitors aircraft using ADS-B data from [adsb.fi](https://opendata.adsb.fi) and correlates it with FlightRadar24 data to provide detailed information about passing aircraft.
 
