@@ -74,6 +74,10 @@ async function correlateFlightRadar(flight) {
     }
     const rego = flight.r?.trim().toUpperCase();
     const matchingRego = frFlights.find(frFlight => String(frFlight.registration).toUpperCase() === rego);
+
+    if (!matchingRego) {
+        console.log(new Date().toUTCString(), 'FlightRadar missing', rego, JSON.stringify(frFlights));
+    }
     return matchingRego;
 }
 
