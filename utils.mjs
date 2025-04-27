@@ -6,6 +6,15 @@ const flightCodes = {
     VOZ: "Virgin Australia",
 }
 
+export function articleise(word) {
+    const vowels = ['a', 'e', 'i', 'o', 'u'];
+    const letter = word.slice(0, 1).toLowerCase();
+    if (vowels.includes(letter)) {
+        return `an ${word}`;
+    }
+    return `a ${word}`;
+}
+
 
 export function getAirline(flight) {
     const operator = flight.ownOp.toUpperCase();
@@ -21,6 +30,10 @@ export function getAirline(flight) {
     }
 
     return titlecase(operator.replace(/\sPTY\sLIMITED\.?/, '').replace(/\sPTY\sLTD\.?/, '').replace(' LIMITED', '').toLowerCase());
+}
+
+export function sanitiseModel(model) {
+    return titlecase(model || 'unknown aircraft');
 }
 
 export function isInBoundingBox(point, boundingBox) {

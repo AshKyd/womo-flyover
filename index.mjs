@@ -1,7 +1,7 @@
 import flightradarapi from "flightradarapi";
 import fs from 'fs';
 import dotenv from 'dotenv';
-import { getAirline, isInBoundingBox, makeGeoJson } from './utils.mjs'
+import { articleise, getAirline, isInBoundingBox, makeGeoJson, sanitiseModel } from './utils.mjs'
 import { post } from "./post.mjs";
 
 dotenv.config();
@@ -18,15 +18,16 @@ function getMessage(flight, frData) {
     const destName = airportCodes[dest];
     const flightNumber = flight.flight?.trim();
     const airline = getAirline(flight);
+    const model = sanitiseModel(flight.desc);
 
     if (flight.category === 'A7') {
-        return `🚁 ${airline} is flying a ${flight.desc} helicopter overhead`
+        return `🚁 ${airline} is flying ${articleise(model)} helicopter overhead`
     }
 
     if (src && dest) {
-        return `✈️ ${airline} operating a ${flight.desc}, flight ${flightNumber} from ${srcName || src} to ${destName || dest} is passing overhead`;
+        return `✈️ ${airline} operating ${articleise(model)}, flight ${flightNumber} from ${srcName || src} to ${destName || dest} is passing overhead`;
     }
-    return `${airline} operating a ${flight.desc}, flight ${flightNumber} is passing overhead`;
+    return `${airline} operating ${articleise(model)}, flight ${flightNumber} is passing overhead`;
 }
 
 async function announceFlight(flight) {
