@@ -1,18 +1,26 @@
 import titlecase from 'titlecase'
 
+const flightCodes = {
+    SIA: 'Singapore Airlines',
+    QF: 'Qantas',
+    VOZ: "Virgin Australia",
+}
 
 
 export function getAirline(flight) {
+    const operator = flight.ownOp.toUpperCase();
+
+    const [_code, operatorFromCode] = Object.entries(flightCodes).find(([code]) => flight.flight?.slice(0, code.length) === code) || [];
+
+    if (operatorFromCode) {
+        return operatorFromCode;
+    }
+
     if (!flight.ownOp) {
         return 'Unknown operator';
     }
-    const operator = flight.ownOp.toUpperCase();
 
-    if (flight.flight?.match(/^QF/)) {
-        return 'Qantas'
-    }
-
-    return titlecase(operator.replace(/\sPTY\sLIMITED\.?/, '').replace(/\sPTY\LTD\.?/, '').toLowerCase());
+    return titlecase(operator.replace(/\sPTY\sLIMITED\.?/, '').replace(/\sPTY\sLTD\.?/, '').replace(' LIMITED').toLowerCase());
 }
 
 export function isInBoundingBox(point, boundingBox) {
