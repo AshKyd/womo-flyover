@@ -29,7 +29,7 @@ function getMessage(flight, frData) {
     return `${airline} operating a ${flight.desc}, flight ${flightNumber} is passing overhead`;
 }
 
-function announceFlight(flight) {
+async function announceFlight(flight) {
     const rego = flight.r?.trim().toUpperCase();
     if (announcedFlights.includes(rego)) {
         return;
@@ -68,7 +68,7 @@ function accumulateFlights(aircraft) {
 async function correlateFlightRadar(flight) {
     const frApi = new flightradarapi.FlightRadar24API();
     let bounds = frApi.getBoundsByPoint(flight.lat, flight.lon, 1000);
-    let frFlights = await frApi.getFlights(null, bounds);
+    const frFlights = await frApi.getFlights(null, bounds);
     if (frFlights.length === 1) {
         return frFlights[0];
     }
@@ -89,9 +89,9 @@ async function track() {
 
     const overheadFlights = flights.aircraft.filter(aircraft => isInBoundingBox([
         aircraft.lon, aircraft.lat
-    ], bbox))
+    ], bbox));
 
-    await overheadFlights.map(announceFlight);
+    await Promise.all(overheadFlights.map(announceFlight));
 }
 
 track();
