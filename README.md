@@ -5,16 +5,7 @@ A Node.js application that tracks aircraft flying over South Brisbane (West of M
 ## Installation
 
 1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/flightradar-womo.git
-cd flightradar-womo
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
+2. Install dependencies: `npm i`
 3. Create a `.env` file based on `.env-example` or specify environment variables on the command line.
 
 ## Configuration
