@@ -2,13 +2,6 @@
 
 A Node.js application that tracks aircraft flying over South Brisbane (West of Montague/WOMO) and posts updates to Mastodon. The application monitors aircraft using ADS-B data from [adsb.fi](https://opendata.adsb.fi) and correlates it with FlightRadar24 data to provide detailed information about passing aircraft.
 
-## Prerequisites
-
-- Node.js (v14 or higher recommended)
-- npm or yarn
-- A Mastodon account
-- FlightRadar24 API access token
-
 ## Installation
 
 1. Clone the repository:
