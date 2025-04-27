@@ -27,8 +27,6 @@ function getMessage(flight, frData) {
         return `✈️ ${airline} operating a ${flight.desc}, flight ${flightNumber} from ${srcName || src} to ${destName || dest} is passing overhead`;
     }
     return `${airline} operating a ${flight.desc}, flight ${flightNumber} is passing overhead`;
-
-
 }
 
 function announceFlight(flight) {
@@ -39,7 +37,7 @@ function announceFlight(flight) {
 
     const frData = correlateFlightRadar(flight).catch(e => null);
     const message = getMessage(flight, frData);
-    console.log(new Date().toISOString(), 'found flight', JSON.stringify(flight, frData));
+    console.log(new Date().toISOString(), 'found flight', JSON.stringify({ flight, frData }));
     post(message);
     announcedFlights = [rego, ...announcedFlights.slice(0, 10)];
 }
