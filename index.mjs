@@ -35,7 +35,7 @@ function announceFlight(flight) {
         return;
     }
 
-    const frData = correlateFlightRadar(flight).catch(e => null);
+    const frData = await correlateFlightRadar(flight).catch(e => null);
     const message = getMessage(flight, frData);
     console.log(new Date().toISOString(), 'found flight', JSON.stringify({ flight, frData }));
     post(message);
