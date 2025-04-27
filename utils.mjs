@@ -17,7 +17,7 @@ export function articleise(word) {
 
 
 export function getAirline(flight) {
-    const operator = flight.ownOp.toUpperCase();
+    const operator = flight.ownOp?.toUpperCase();
 
     const [_code, operatorFromCode] = Object.entries(flightCodes).find(([code]) => flight.flight?.slice(0, code.length) === code) || [];
 
