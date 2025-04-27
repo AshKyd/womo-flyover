@@ -6,7 +6,7 @@ import { post } from "./post.mjs";
 
 dotenv.config();
 
-const airportCodes = fs.readFileSync('data/airportCodes.json');
+const airportCodes = JSON.parse(fs.readFileSync('data/airportCodes.json'));
 let announcedFlights = [];
 const bbox = [-27.46534, 153.02393, -27.51268, 152.95372];
 
