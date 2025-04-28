@@ -1,19 +1,5 @@
 import titlecase from "titlecase";
-
-const flightCodes = {
-  SIA: "Singapore Airlines",
-  QF: "Qantas",
-  VOZ: "Virgin Australia",
-  MXD: "Batik Air Malaysia",
-  UAE: "Emirates",
-  CPA: "Cathay Pacific",
-  CAL: "China Airlines",
-  CSN: "China Southern",
-  ANG: "Air Niugini",
-  ASY: "RAAF",
-  KAL: "Korean Air",
-  ANZ: "Air New Zealand",
-};
+import airlines from "airline-codes";
 
 export function articleise(word) {
   const vowels = ["a", "e", "i", "o", "u"];
@@ -25,10 +11,8 @@ export function articleise(word) {
 }
 
 export function getAirline(flight) {
-  const [_code, operatorFromCode] =
-    Object.entries(flightCodes).find(
-      ([code]) => flight.flight?.slice(0, code.length) === code
-    ) || [];
+  const icao = flight.flight?.slice(0, 3);
+  const operatorFromCode = airlines.findWhere({ icao }).get("name");
 
   if (operatorFromCode) {
     return operatorFromCode;

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "airline-codes": "^1.0.3",
     "dotenv": "^16.5.0",
     "flightradarapi": "^1.3.33",
     "masto": "^6.10.4",
