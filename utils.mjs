@@ -12,6 +12,7 @@ const flightCodes = {
   ANG: "Air Niugini",
   ASY: "RAAF",
   KAL: "Korean Air",
+  ANZ: "Air New Zealand",
 };
 
 export function articleise(word) {
