@@ -10,6 +10,7 @@ const flightCodes = {
   CAL: "China Airlines",
   CSN: "China Southern",
   ANG: "Air Niugini",
+  ASY: "RAAF",
 };
 
 export function articleise(word) {
