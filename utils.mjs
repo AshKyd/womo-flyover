@@ -9,6 +9,7 @@ const flightCodes = {
   CPA: "Cathay Pacific",
   CAL: "China Airlines",
   CSN: "China Southern",
+  ANG: "Air Niugini",
 };
 
 export function articleise(word) {
