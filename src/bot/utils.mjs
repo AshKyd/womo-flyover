@@ -26,7 +26,7 @@ export function getAirline(flight) {
     return "Unknown operator";
   }
 
-  return titlecase(flight.ownOp);
+  return titlecase(flight.ownOp.toLowerCase());
 }
 
 export function sanitiseModel(model) {
