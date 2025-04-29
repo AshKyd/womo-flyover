@@ -11,25 +11,22 @@ export function articleise(word) {
 }
 
 export function getAirline(flight) {
-  const icao = flight.flight?.length > 3 && flight.flight?.slice(0, 3);
-  const operatorFromCode = icao && airlines.findWhere({ icao }).get("name");
+  // Only check larger planes. Prop planes have weird flight numbers
+  // that don't correspond to icao lookups
+  if (["A0", "A2", "A5"].includes(flight.category)) {
+    const icao = flight.flight?.length > 3 && flight.flight?.slice(0, 3);
+    const operatorFromCode = icao && airlines.findWhere({ icao })?.get("name");
 
-  if (operatorFromCode) {
-    return operatorFromCode;
+    if (operatorFromCode) {
+      return operatorFromCode;
+    }
   }
 
   if (!flight.ownOp) {
     return "Unknown operator";
   }
 
-  const operator = flight.ownOp.toUpperCase();
-  return titlecase(
-    operator
-      .replace(/\sPTY\sLIMITED\.?/, "")
-      .replace(/\sPTY\sLTD\.?/, "")
-      .replace(" LIMITED", "")
-      .toLowerCase()
-  );
+  return titlecase(flight.ownOp);
 }
 
 export function sanitiseModel(model) {
