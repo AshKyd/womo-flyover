@@ -17,6 +17,7 @@ app.get("/go/:code", (req, res) => {
   if (req.get("User-Agent")?.includes("Mastodon")) {
     res.status(403);
     res.json({ error: "disallowed by robots.txt" });
+    return;
   }
   const code = req.params.code;
   if (!code.match(/[a-z0-9]+/)) {
