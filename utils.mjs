@@ -11,8 +11,8 @@ export function articleise(word) {
 }
 
 export function getAirline(flight) {
-  const icao = flight.flight?.slice(0, 3);
-  const operatorFromCode = airlines.findWhere({ icao }).get("name");
+  const icao = flight.flight?.length > 3 && flight.flight?.slice(0, 3);
+  const operatorFromCode = icao && airlines.findWhere({ icao }).get("name");
 
   if (operatorFromCode) {
     return operatorFromCode;
