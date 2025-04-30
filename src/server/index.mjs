@@ -24,7 +24,7 @@ app.get("/go/:code", (req, res) => {
     res.send("Invalid code");
   }
   res.status(302);
-  res.header("Location", `https://globe.adsb.fi/?icao=${code}`);
+  res.header("Location", `https://globe.adsb.fi/?icao=${code}&zoom=13`);
   res.json({});
 });
 
