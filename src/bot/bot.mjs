@@ -14,7 +14,7 @@ dotenv.config();
 
 const airportCodes = JSON.parse(fs.readFileSync("data/airportCodes.json"));
 let announcedFlights = [];
-const bbox = [-27.46534, 153.02393, -27.51268, 152.95372];
+const bbox = [-27.46534, 153.02393, -27.51268, 152.994664];
 
 function getMessage(flight, frData) {
   const src = frData?.originAirportIata;
