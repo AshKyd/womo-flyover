@@ -114,7 +114,7 @@ async function correlateFlightRadar(flight) {
 export async function track() {
   console.log(new Date().toISOString(), "tracking...");
   const flights = await fetch(
-    "https://opendata.adsb.fi/api/v2/lat/-27.4495399/lon/153.0486157/dist/8"
+    "https://opendata.adsb.fi/api/v2/lat/-27.4495399/lon/153.0486157/dist/15"
   ).then((res) => res.json());
   accumulateFlights(flights.aircraft);
   fs.writeFileSync(
