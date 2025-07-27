@@ -64,6 +64,8 @@ async function announceFlight(flight) {
 
 let accumulatedFlights = {};
 
+export let aircrafts = {};
+
 /** add tracks to flights, so we can see where they've been and where they're going */
 function accumulateFlights(aircraft) {
   const _accumulatedFlights = accumulatedFlights;
@@ -80,6 +82,7 @@ function accumulateFlights(aircraft) {
     }
     newAccumulations[rego] = log;
     plane.lineString = log;
+    aircrafts[rego] = plane;
   });
   accumulatedFlights = newAccumulations;
   return aircraft;

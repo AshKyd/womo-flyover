@@ -1,5 +1,6 @@
 import express from "express";
 import morgan from "morgan";
+import { aircrafts } from "../bot/bot.mjs";
 const app = express();
 
 app.use(morgan("combined"));
@@ -26,6 +27,10 @@ app.get("/go/:code", (req, res) => {
   res.status(302);
   res.header("Location", `https://globe.adsb.fi/?icao=${code}&zoom=13`);
   res.json({});
+});
+
+app.get("/aircrafts", (req, res) => {
+  res.json(aircrafts);
 });
 
 export function startServer(port = 3000) {
