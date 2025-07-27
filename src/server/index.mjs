@@ -1,5 +1,6 @@
 import express from "express";
 import morgan from "morgan";
+import cors from "cors";
 import { aircrafts } from "../bot/bot.mjs";
 const app = express();
 
@@ -29,7 +30,7 @@ app.get("/go/:code", (req, res) => {
   res.json({});
 });
 
-app.get("/aircrafts", (req, res) => {
+app.get("/aircrafts", cors(), (req, res) => {
   res.json(aircrafts);
 });
 
