@@ -9,6 +9,7 @@ import {
   sanitiseModel,
 } from "./utils.mjs";
 import { post } from "./post.mjs";
+import { getRowsByDateRange, insertRow } from "./db.mjs";
 
 dotenv.config();
 
@@ -25,9 +26,8 @@ function getMessage(flight, frData) {
   const airline = getAirline(flight);
   const model = sanitiseModel(flight.desc);
 
-  const url = `${process.env.BASEURL || "http://localhost:3000"}/go/${
-    flight.hex
-  }`;
+  const url = `${process.env.BASEURL || "http://localhost:3000"}/go/${flight.hex
+    }`;
 
   if (flight.category === "A7") {
     return `🚁 ${airline} is flying ${articleise(
@@ -36,9 +36,8 @@ function getMessage(flight, frData) {
   }
 
   if (src && dest) {
-    return `✈️ ${airline} flight ${flightNumber} from ${srcName || src} to ${
-      destName || dest
-    }, operating ${articleise(model)} is passing overhead ${url}`;
+    return `✈️ ${airline} flight ${flightNumber} from ${srcName || src} to ${destName || dest
+      }, operating ${articleise(model)} is passing overhead ${url}`;
   }
   return `${airline}, flight ${flightNumber} operating ${articleise(
     model
@@ -83,9 +82,18 @@ function accumulateFlights(aircraft) {
     newAccumulations[rego] = log;
     plane.lineString = log;
     aircrafts[rego] = plane;
+    insertRow(getAESTISOString(), plane.lat, plane.lon, rego);
   });
   accumulatedFlights = newAccumulations;
   return aircraft;
+}
+
+function getAESTISOString() {
+  const now = new Date();
+  // Get UTC time, then add 10 hours
+  const aest = new Date(now.getTime() + 10 * 60 * 60 * 1000);
+  // Format as ISO 8601 without Z (local time)
+  return aest.toISOString().replace('Z', '+10:00');
 }
 
 async function correlateFlightRadar(flight) {
@@ -127,4 +135,5 @@ export async function track() {
   );
 
   await Promise.all(overheadFlights.map(announceFlight));
+
 }
