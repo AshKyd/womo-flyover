@@ -1,7 +1,6 @@
 import { createRestAPIClient } from "masto";
 // import { BskyAgent } from "@atproto/api";
 export async function post(status) {
-    return;
     const masto = createRestAPIClient({
         url: process.env.MASTODON_SERVER,
         accessToken: process.env.ACCESS_TOKEN,

@@ -35,7 +35,7 @@ app.get("/aircrafts", cors(), (req, res) => {
   res.json(aircrafts);
 });
 
-app.get("/points/:date", cors(), (req, res) => {
+app.get("/tracks/:date", cors(), (req, res) => {
   const date = req.params.date;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
     res.status(400).json({ error: "Invalid date format. Use yyyy-mm-dd." });
@@ -43,14 +43,22 @@ app.get("/points/:date", cors(), (req, res) => {
   }
   const start = `${date}T00:00:00`;
   const end = `${date}T23:59:59`;
-  getRowsByDateRange(start, end, (err, rows) => {
+  getRowsByDateRange(start, end, (err, data) => {
     if (err) {
       res.status(500).json({ error: "Database error" });
       return;
     }
-    // Return as compact array of [lon, lat]
-    const points = rows.map(r => [r.longitude, r.latitude]);
-    res.json(points);
+    res.json(data);
+  });
+});
+
+app.get("/tracks", cors(), (req, res) => {
+  getRowsByDateRange(start, end, (err, data) => {
+    if (err) {
+      res.status(500).json({ error: "Database error" });
+      return;
+    }
+    res.json(data);
   });
 });
 
