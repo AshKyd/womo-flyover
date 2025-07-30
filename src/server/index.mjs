@@ -35,15 +35,8 @@ app.get("/aircrafts", cors(), (req, res) => {
   res.json(aircrafts);
 });
 
-app.get("/tracks/:date", cors(), (req, res) => {
-  const date = req.params.date;
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-    res.status(400).json({ error: "Invalid date format. Use yyyy-mm-dd." });
-    return;
-  }
-  const start = `${date}T00:00:00`;
-  const end = `${date}T23:59:59`;
-  getRowsByDateRange(start, end, (err, data) => {
+app.get("/tracks", cors(), (req, res) => {
+  getRowsByDateRange('2024', '2030', (err, data) => {
     if (err) {
       res.status(500).json({ error: "Database error" });
       return;
@@ -52,7 +45,14 @@ app.get("/tracks/:date", cors(), (req, res) => {
   });
 });
 
-app.get("/tracks", cors(), (req, res) => {
+app.get("/tracks/:date", cors(), (req, res) => {
+  const date = req.params.date;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    res.status(400).json({ error: "Invalid date format. Use yyyy-mm-dd." });
+    return;
+  }
+  const start = `${date}T00:00:00`;
+  const end = `${date}T23:59:59`;
   getRowsByDateRange(start, end, (err, data) => {
     if (err) {
       res.status(500).json({ error: "Database error" });
