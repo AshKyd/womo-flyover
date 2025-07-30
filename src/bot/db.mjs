@@ -75,9 +75,9 @@ function getRowsByDateRange(startTimestamp, endTimestamp, callback) {
             const groupedData = {};
             rows.forEach(row => {
                 if (!groupedData[row.name]) {
-                    groupedData[row.name] = [];
+                    groupedData[row.name] = { lineString: [] };
                 }
-                groupedData[row.name].push([row.longitude, row.latitude]);
+                groupedData[row.name].lineString.push([row.longitude, row.latitude]);
             });
             callback(null, groupedData);
         }
