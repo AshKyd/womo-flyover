@@ -77,7 +77,10 @@ function getRowsByDateRange(startTimestamp, endTimestamp, callback) {
                 if (!groupedData[row.name]) {
                     groupedData[row.name] = { lineString: [] };
                 }
-                groupedData[row.name].lineString.push([row.longitude, row.latitude]);
+                groupedData[row.name].lineString.push([
+                    Number(row.longitude.toFixed(4)),
+                    Number(row.latitude.toFixed(4))
+                ]);
             });
             callback(null, groupedData);
         }
