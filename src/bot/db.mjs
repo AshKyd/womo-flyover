@@ -35,7 +35,8 @@ const dbReady = (async () => {
           timestamp TEXT NOT NULL,
           latitude REAL NOT NULL,
           longitude REAL NOT NULL,
-          name TEXT NOT NULL
+          name TEXT NOT NULL,
+          elevation INTEGER
         )
         `);
         // Drop aircrafts table for debugging
@@ -47,9 +48,19 @@ const dbReady = (async () => {
           airline TEXT,
           category TEXT,
           year TEXT,
-          ownOp TEXT
+          ownOp TEXT,
+          elevation INTEGER
         )
         `);
+
+        // Add elevation column to locations table if it doesn't exist
+        try {
+            await runAsync(`ALTER TABLE locations ADD COLUMN elevation INTEGER`);
+        } catch (err) {
+            // Column might already exist, which is fine
+            console.log('Elevation column already exists or could not be added:', err.message);
+        }
+
         console.log('Tables "locations" and "aircrafts" ready.');
     } catch (err) {
         console.error("Table creation error:", err.message);
@@ -63,11 +74,12 @@ const dbReady = (async () => {
  * @param {number} latitude
  * @param {number} longitude
  * @param {string} name
+ * @param {number} elevation - Barometric altitude in feet
  */
-async function insertRow(timestamp, latitude, longitude, name) {
+async function insertRow(timestamp, latitude, longitude, name, elevation) {
     await dbReady;
-    const sql = `INSERT INTO locations (timestamp, latitude, longitude, name) VALUES (?, ?, ?, ?)`;
-    db.run(sql, [timestamp, latitude, longitude, name], function (err) {
+    const sql = `INSERT INTO locations (timestamp, latitude, longitude, name, elevation) VALUES (?, ?, ?, ?, ?)`;
+    db.run(sql, [timestamp, latitude, longitude, name, elevation], function (err) {
         if (err) {
             console.error("Insert error:", err.message);
         }
@@ -100,7 +112,8 @@ async function getRowsByDateRange(startTimestamp, endTimestamp) {
                     }
                     groupedData[row.name].lineString.push([
                         Number(row.longitude.toFixed(4)),
-                        Number(row.latitude.toFixed(4))
+                        Number(row.latitude.toFixed(4)),
+                        row.elevation || -1
                     ]);
                 });
                 resolve(groupedData);

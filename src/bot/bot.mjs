@@ -82,7 +82,7 @@ function accumulateFlights(aircraft) {
     newAccumulations[rego] = log;
     plane.lineString = log;
     aircrafts[rego] = plane;
-    insertRow(getAESTISOString(), plane.lat, plane.lon, rego);
+    insertRow(getAESTISOString(), plane.lat, plane.lon, rego, plane.alt_baro === "ground" ? 0 : (plane.alt_baro || null));
     updateAircraft(
       {
         name: rego,
