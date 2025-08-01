@@ -17,27 +17,45 @@ const db = new sqlite3.Database(dbPath, (err) => {
     }
 });
 
-// Create table with timestamp column
-db.serialize(() => {
-    db.run(
-        `
+const dbReady = (async () => {
+    // Helper to wrap db.run in a Promise
+    function runAsync(sql) {
+        return new Promise((resolve, reject) => {
+            db.run(sql, (err) => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+    }
+
+    try {
+        await runAsync(`
         CREATE TABLE IF NOT EXISTS locations (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            timestamp TEXT NOT NULL,
-            latitude REAL NOT NULL,
-            longitude REAL NOT NULL,
-            name TEXT NOT NULL
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          timestamp TEXT NOT NULL,
+          latitude REAL NOT NULL,
+          longitude REAL NOT NULL,
+          name TEXT NOT NULL
         )
-    `,
-        (err) => {
-            if (err) {
-                console.error("Table creation error:", err.message);
-            } else {
-                console.log('Table "locations" ready.');
-            }
-        }
-    );
-});
+        `);
+        // Drop aircrafts table for debugging
+        await runAsync(`
+        CREATE TABLE IF NOT EXISTS aircrafts (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL UNIQUE,
+          model TEXT,
+          airline TEXT,
+          category TEXT,
+          year TEXT,
+          ownOp TEXT
+        )
+        `);
+        console.log('Tables "locations" and "aircrafts" ready.');
+    } catch (err) {
+        console.error("Table creation error:", err.message);
+        throw err;
+    }
+})();
 
 /**
  * Insert a row into the "locations" table.
@@ -46,7 +64,8 @@ db.serialize(() => {
  * @param {number} longitude
  * @param {string} name
  */
-function insertRow(timestamp, latitude, longitude, name) {
+async function insertRow(timestamp, latitude, longitude, name) {
+    await dbReady;
     const sql = `INSERT INTO locations (timestamp, latitude, longitude, name) VALUES (?, ?, ?, ?)`;
     db.run(sql, [timestamp, latitude, longitude, name], function (err) {
         if (err) {
@@ -59,31 +78,114 @@ function insertRow(timestamp, latitude, longitude, name) {
  * Query all rows between two ISO 8601 timestamps, grouped by name.
  * @param {string} startTimestamp
  * @param {string} endTimestamp
- * @param {Function} callback - Receives (err, groupedData) where groupedData is {[name]: [[lon, lat], [lon, lat], ...]}
+ * @returns {Promise<{[name: string]: {lineString: number[][]}}>} groupedData
  */
-function getRowsByDateRange(startTimestamp, endTimestamp, callback) {
+async function getRowsByDateRange(startTimestamp, endTimestamp) {
+    await dbReady;
     const sql = `
         SELECT * FROM locations
         WHERE timestamp >= ? AND timestamp <= ?
         ORDER BY timestamp ASC
     `;
-    db.all(sql, [startTimestamp, endTimestamp], (err, rows) => {
-        if (err) {
-            callback(err, null);
-        } else {
-            // Group rows by name
-            const groupedData = {};
-            rows.forEach(row => {
-                if (!groupedData[row.name]) {
-                    groupedData[row.name] = { lineString: [] };
-                }
-                groupedData[row.name].lineString.push([
-                    Number(row.longitude.toFixed(4)),
-                    Number(row.latitude.toFixed(4))
-                ]);
-            });
-            callback(null, groupedData);
-        }
+    return new Promise((resolve, reject) => {
+        db.all(sql, [startTimestamp, endTimestamp], (err, rows) => {
+            if (err) {
+                reject(err);
+            } else {
+                // Group rows by name
+                const groupedData = {};
+                rows.forEach(row => {
+                    if (!groupedData[row.name]) {
+                        groupedData[row.name] = { lineString: [] };
+                    }
+                    groupedData[row.name].lineString.push([
+                        Number(row.longitude.toFixed(4)),
+                        Number(row.latitude.toFixed(4))
+                    ]);
+                });
+                resolve(groupedData);
+            }
+        });
+    });
+}
+
+/**
+ * Get the first and last available dates in the locations table (async).
+ * @returns {Promise<{firstDate: string, lastDate: string}>}
+ */
+async function getAvailableDateRange() {
+    await dbReady;
+    const sql = `
+        SELECT 
+            MIN(DATE(timestamp)) as firstDate, 
+            MAX(DATE(timestamp)) as lastDate 
+        FROM locations
+    `;
+    return new Promise((resolve, reject) => {
+        db.get(sql, (err, row) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve({ firstDate: row.firstDate, lastDate: row.lastDate });
+            }
+        });
+    });
+}
+
+/**
+ * Create or update an aircraft row by name.
+ * @param {Object} aircraft - { name, model, airline, category, year, ownOp }
+ * @param {Function} callback - Receives (err)
+ */
+async function updateAircraft(aircraft, callback) {
+    await dbReady;
+    const sql = `
+        INSERT INTO aircrafts (name, model, airline, category, year, ownOp)
+        VALUES (?, ?, ?, ?, ?, ?)
+        ON CONFLICT(name) DO UPDATE SET
+            name=excluded.name,
+            model=excluded.model,
+            airline=excluded.airline,
+            category=excluded.category,
+            year=excluded.year,
+            ownOp=excluded.ownOp
+    `;
+    db.run(
+        sql,
+        [
+            aircraft.name,
+            aircraft.model,
+            aircraft.airline,
+            aircraft.category,
+            aircraft.year,
+            aircraft.ownOp
+        ],
+        callback
+    );
+}
+
+/**
+ * Get all aircrafts that were seen in the given date range.
+ * @param {string} startTimestamp
+ * @param {string} endTimestamp
+ * @returns {Promise<Array>} Array of aircrafts
+ */
+async function getAircraftsByDateRange(startTimestamp, endTimestamp) {
+    await dbReady;
+    const sql = `
+        SELECT DISTINCT a.name, a.model, a.airline, a.category, a.year, a.ownOp
+        FROM aircrafts a
+        JOIN locations l ON a.name = l.name
+        WHERE l.timestamp >= ? AND l.timestamp <= ?
+    `;
+    return new Promise((resolve, reject) => {
+        db.all(sql, [startTimestamp, endTimestamp], (err, rows) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
     });
 }
 
@@ -92,4 +194,4 @@ function getRowsByDateRange(startTimestamp, endTimestamp, callback) {
 // getRowsByDateRange('2025-07-28T00:00:00', '2025-07-28T23:59:59', console.log);
 
 // Export functions
-export { insertRow, getRowsByDateRange };
+export { insertRow, getRowsByDateRange, getAvailableDateRange, updateAircraft, getAircraftsByDateRange, dbReady };

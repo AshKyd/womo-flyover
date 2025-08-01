@@ -9,7 +9,7 @@ import {
   sanitiseModel,
 } from "./utils.mjs";
 import { post } from "./post.mjs";
-import { getRowsByDateRange, insertRow } from "./db.mjs";
+import { getRowsByDateRange, insertRow, updateAircraft } from "./db.mjs";
 
 dotenv.config();
 
@@ -83,6 +83,21 @@ function accumulateFlights(aircraft) {
     plane.lineString = log;
     aircrafts[rego] = plane;
     insertRow(getAESTISOString(), plane.lat, plane.lon, rego);
+    updateAircraft(
+      {
+        name: rego,
+        model: sanitiseModel(plane.desc),
+        airline: getAirline(plane),
+        category: plane.category || "",
+        year: plane.year || "",
+        ownOp: plane.ownOp || ""
+      },
+      (err) => {
+        if (err) {
+          console.error("Aircraft upsert error:", err);
+        }
+      }
+    );
   });
   accumulatedFlights = newAccumulations;
   return aircraft;
